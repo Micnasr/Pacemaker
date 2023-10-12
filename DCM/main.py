@@ -27,11 +27,12 @@ def signup():
     password = entry_password.get()
     
     # Add account to the object
-    users.add_user(username, password)
+    if (FindUser(username) == ""):
+        users.add_user(username, password)
+        messagebox.showinfo("Signup Successful", "Account created for " + username + "!")
 
-    # For example, you can save it in a file or a database
-    # Replace this with your own logic to handle user registration
-    messagebox.showinfo("Signup Successful", "Account created for " + username + "!")
+    else:
+        messagebox.showerror("Signup Failed", "Username Exits Already, Did you mean to Log in?")
 
 
 # Create an Accounts object

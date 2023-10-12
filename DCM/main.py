@@ -26,10 +26,15 @@ def signup():
     username = entry_username.get()
     password = entry_password.get()
     
-    # Add account to the object
+    # Add account to the object if it does not already exist
     if (FindUser(username) == ""):
-        users.add_user(username, password)
-        messagebox.showinfo("Signup Successful", "Account created for " + username + "!")
+        
+        # Only Allow 10 users to be stored locally
+        if users.length < 10:
+            users.add_user(username, password)
+            messagebox.showinfo("Signup Successful", "Account created for " + username + "!")
+        else:
+            messagebox.showerror("Signup Failed", "Max of 10 Users Reached")
 
     else:
         messagebox.showerror("Signup Failed", "Username Exits Already, Did you mean to Log in?")

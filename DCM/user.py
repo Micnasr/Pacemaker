@@ -25,7 +25,8 @@ class Accounts:
         except FileNotFoundError:
             # Handle the case where the file doesn't exist yet
             pass
-
+    
+    # Add User to Object
     def add_user(self, username, password):
 
         # Create User

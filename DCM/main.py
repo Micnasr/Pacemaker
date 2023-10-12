@@ -3,13 +3,20 @@ from tkinter import messagebox
 
 import user as u
 
+# Find User in Accounts and Return Password
+def FindUser(username):
+    for person in users.accounts:
+        if person.name == username:
+            return person.password
+            
+    return ""
+
 # Function to check if the entered username and password are correct
 def login():
     username = entry_username.get()
     password = entry_password.get()
-    
-    # Replace 'your_username' and 'your_password' with your actual credentials
-    if username == 'your_username' and password == 'your_password':
+
+    if FindUser(username) == password:
         messagebox.showinfo("Login Successful", "Welcome, " + username + "!")
     else:
         messagebox.showerror("Login Failed", "Incorrect username or password")
@@ -19,8 +26,8 @@ def signup():
     username = entry_username.get()
     password = entry_password.get()
     
-    # You can add code here to store the new user information
-    accounts.add_user(username, password)
+    # Add account to the object
+    users.add_user(username, password)
 
     # For example, you can save it in a file or a database
     # Replace this with your own logic to handle user registration
@@ -28,7 +35,7 @@ def signup():
 
 
 # Create an Accounts object
-accounts = u.Accounts()
+users = u.Accounts()
 
 
 # Create the main window

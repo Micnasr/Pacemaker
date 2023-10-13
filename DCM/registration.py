@@ -12,7 +12,7 @@ def find_user(users, username):
 # Function to check if the entered username and password are correct
 def login(users, username, password):
     if find_user(users, username) == password:
-        messagebox.showinfo("Login Successful", "Welcome, " + username + "!")
+        #messagebox.showinfo("Login Successful", "Welcome, " + username + "!")
         return 1
     else:
         messagebox.showerror("Login Failed", "Incorrect username or password")

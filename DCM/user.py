@@ -1,9 +1,10 @@
 import os
 
 class User:
-    def __init__(self, name, password):
+    def __init__(self, name, password, data):
         self.name = name
         self.password = password
+        self.data = data
 
 class Accounts:
     def __init__(self):
@@ -24,9 +25,10 @@ class Accounts:
                 lines = file.readlines()
                 for line in lines:
                     parts = line.strip().split()
-                    if len(parts) == 2:
-                        username, password = parts
-                        self.accounts.append(User(username, password))
+                    if len(parts) == 10:
+                        username, password = parts[0:2]
+                        data = parts[2:]
+                        self.accounts.append(User(username, password, data))
                         self.length += 1
         except FileNotFoundError:
             # Handle the case where the file doesn't exist yet
@@ -36,7 +38,7 @@ class Accounts:
     def add_user(self, username, password):
         # Create User
         if self.length < 10:
-            self.accounts.append(User(username, password))
+            self.accounts.append(User(username, password, [60, 120, 3.5, 0.4, 3.5, 0.4, 320, 250]))
             self.length += 1
             self.update_file()
         else:
@@ -47,6 +49,9 @@ class Accounts:
         try:
             with open(self.accounts_file_path, "w") as file:
                 for user in self.accounts:
-                    file.write(f"{user.name} {user.password}\n")
+                    file.write(f"{user.name} {user.password} ")
+                    for value in user.data:
+                        file.write(f"{value} ")
+                    file.write("\n")
         except IOError as e:
             print(f"Error writing to accounts.txt: {e}")

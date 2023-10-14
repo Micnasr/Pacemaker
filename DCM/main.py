@@ -18,7 +18,7 @@ window = tk.Tk()
 window.title("Pacemaker Welcome")
 
 # Set the starting size of the window (width x height)
-window.geometry("500x300")
+window.geometry("600x450")
 
 # Create a frame to hold the components
 frame = tk.Frame(window)
@@ -37,7 +37,10 @@ def show_welcome_state():
         password = entry_password.get()
 
         # Calls the login function in registration and updates the GUI State
-        if reg.login(users, username, password):
+        login_check = reg.login(users, username, password)
+        if login_check[0]:
+            global current_user
+            current_user = login_check[1]
             update_state(AppState.TELEMETRY)
 
     def handle_signup():
@@ -75,9 +78,55 @@ def show_welcome_state():
 def show_telemetry_state():
     clear_frame()
 
+    def update_text():
+        for widget in frame2.winfo_children():
+            widget.destroy()
+        settings = mode_settings[selected.get()]
+        for i in range(len(settings)):
+            mode_label = tk.Label(frame2, text=params[settings[i]] + ":")
+            mode_label.grid(row = i, column = 0, pady = 10)
+
+            value_label = tk.Label(frame2, text=current_user.data[settings[i]])
+            value_label.grid(row=i, column=1, pady=10, padx = 5)
+
+            param_entry = tk.Entry(frame2)
+            param_entry.grid(row = i, column = 2, padx = 10, pady = 10)
+        submit_buttom = tk.Button(frame2, text="Submit Changes")
+        submit_buttom.grid(row=i+1, column=2)
+
+    modes = [
+        "AOO",
+        "VOO",
+        "AAI",
+        "VVI"    
+    ]
+
+    params = ["Lower Rate Limit", "Upper Rate Limit", "Atrial Amplitude", "Atrial Pulse Width", "Ventricular Amplitude", "Ventricular Pulse Width", "VRP", "ARP"]
+
+    mode_settings = {
+        "AOO" : [0, 1, 2, 3],
+        "VOO" : [0, 1, 4, 5],
+        "AAI" : [0, 1, 2, 3, 7],
+        "VVI" : [0, 1, 4, 5, 6]
+    }
+
     # Create a telemetry label
     telemetry_label = tk.Label(frame, text="Welcome to Telemetry")
     telemetry_label.pack()
+
+    selected = tk.StringVar(frame)
+    selected.set(modes[0])
+
+    dropdown = tk.OptionMenu(frame, selected, *modes)
+    dropdown.pack()
+
+    mode_button = tk.Button(frame, text="Select", command=update_text)
+    mode_button.pack()
+
+    frame2 = tk.Frame(frame)
+    frame2.pack()
+
+    
 
 # Create a StringVar to store the current state (allows 2 way communication between widgets and variables)
 current_state = tk.StringVar()

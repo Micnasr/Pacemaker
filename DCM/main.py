@@ -8,6 +8,12 @@ from enum import Enum
 # Create an Accounts object
 users = u.Accounts()
 
+#Provisional Placeholder for Hardware Connection
+connected = 1
+serial = "125"
+users.serial = serial
+users.update_device_file()
+
 # Define an enumeration for the different states
 class AppState(Enum):
     WELCOME = 1
@@ -27,6 +33,20 @@ frame.pack(expand=True, fill="both", pady=50)
 def clear_frame():
     for widget in frame.winfo_children():
         widget.pack_forget()
+
+# Handle New Hardware / Connection Visuals
+def connection_UI():
+    connected_label = tk.Label(frame, text="", fg="white")
+    connected_label.pack(pady=10)
+
+    #Display whether a device is connected or not 
+    if connected:
+        if serial == users.old_serial:
+            connected_label.config(text=f"Communicating With Device: {serial}", bg="green")
+        else:
+            connected_label.config(text=f"Communicating With New Device: {serial}", bg="green")
+    else:
+        connected_label.config(text="Not Communicating With Device", bg = "red")
 
 # Function to display the Welcome state
 def show_welcome_state():
@@ -55,24 +75,7 @@ def show_welcome_state():
     welcome_label = tk.Label(frame, text="Pacemaker Welcome")
     welcome_label.pack()
 
-    connected_label = tk.Label(frame, text="", fg="white")
-    connected_label.pack(pady=10)
-
-    #Provisional placeholder
-    global connected, serial
-    connected = 1
-    serial = "122"
-    users.serial = serial
-    users.update_device_file()
-
-    #Display whether a device is connected or not 
-    if connected:
-        if serial == users.old_serial:
-            connected_label.config(text=f"Communicating With Device: {serial}", bg="green")
-        else:
-            connected_label.config(text=f"Communicating With New Device: {serial}", bg="green")
-    else:
-        connected_label.config(text="Not Communicating With Device", bg = "red")
+    connection_UI()
 
     # Create username and password fields
     label_username = tk.Label(frame, text="Username:")
@@ -249,17 +252,7 @@ def show_telemetry_state():
     telemetry_label = tk.Label(frame, text="Welcome to Telemetry")
     telemetry_label.pack()
 
-    connected_label = tk.Label(frame, text="", fg="white")
-    connected_label.pack(pady=10)
-
-    #Display whether a device is connected or not 
-    if connected:
-        if serial == users.old_serial:
-            connected_label.config(text=f"Communicating With Device: {serial}", bg="green")
-        else:
-            connected_label.config(text=f"Communicating With New Device: {serial}", bg="green")
-    else:
-        connected_label.config(text="Not Communicating With Device", bg = "red")
+    connection_UI()
 
     #Set default for the dropdown menu
     selected = tk.StringVar(frame)

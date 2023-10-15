@@ -37,6 +37,7 @@ class Accounts:
                 lines = file.readlines()
                 self.old_serial = lines[0].strip()
             
+            # Handle Reading Data from files and populating data structures
             with open(self.accounts_file_path, "r") as file:
                 
                 lines = file.readlines()
@@ -82,8 +83,6 @@ class Accounts:
             
     def update_file(self):
         try:
-
-
             # Initialize the Key
             cipher_suite = Fernet(hardcoded_key)
             with open(self.accounts_file_path, "w") as file:

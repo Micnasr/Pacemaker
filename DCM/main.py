@@ -15,7 +15,6 @@ class AppState(Enum):
 
 # Create the main window
 window = tk.Tk()
-window.title("Pacemaker Welcome")
 
 # Set the starting size of the window (width x height)
 window.geometry("600x450")
@@ -50,6 +49,7 @@ def show_welcome_state():
         reg.signup(users, username, password)
 
     clear_frame()
+    window.title("Pacemaker Welcome")
 
     # Create a welcome label
     welcome_label = tk.Label(frame, text="Pacemaker Welcome")
@@ -77,6 +77,7 @@ def show_welcome_state():
 # Function to display the Telemetry state
 def show_telemetry_state():
     clear_frame()
+    window.title("Telemetry")
 
     #Method for updating text on screen when mode is changed
     def update_text():

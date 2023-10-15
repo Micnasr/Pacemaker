@@ -1,6 +1,6 @@
 from tkinter import messagebox
 
-# Find User in Accounts and Return Password
+# Find User in Accounts and Return Object
 def find_user(users, username):
     for person in users.accounts:
         if person.name == username:
@@ -12,7 +12,7 @@ def find_user(users, username):
 # Function to check if the entered username and password are correct
 def login(users, username, password):
     this_user = find_user(users, username)
-    if this_user.password == password:
+    if this_user != -1 and this_user.password == password:
         #messagebox.showinfo("Login Successful", "Welcome, " + username + "!")
         return 1, this_user
     else:
@@ -23,8 +23,10 @@ def login(users, username, password):
 def signup(users, username, password):
     # Only allow signup if the username is NOT used
     if (find_user(users, username) == -1):
+        
         # Only allow 10 users max
         if users.length < 10:
+            
             # Make sure the input is valid
             if password == "" or username == "":
                 messagebox.showerror("Signup Failed", "Empty Field")

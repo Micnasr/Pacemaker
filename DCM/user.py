@@ -1,4 +1,9 @@
 import os
+from cryptography.fernet import Fernet # pip install cryptography
+import base64
+
+# Cryptography Key Used To Encode / Decode
+hardcoded_key = "Rw8ET5s7oZ4Mc9iK97qaxnGAt8r66sBkJ1oG-09NEN0="
 
 class User:
     def __init__(self, name, password, data):
@@ -21,15 +26,32 @@ class Accounts:
     # Read from file and store accounts in object
     def load_accounts(self):
         try:
+            # Initialize the key
+            cipher_suite = Fernet(hardcoded_key)
+
             with open(self.accounts_file_path, "r") as file:
+                
                 lines = file.readlines()
-                for line in lines:
-                    parts = line.strip().split()
+
+                for encrypted_message_str in lines:
+                    
+                    # Decrypt the message
+                    encrypted_message = base64.b64decode(encrypted_message_str.encode())
+                    decrypted_message = cipher_suite.decrypt(encrypted_message)
+
+                    # Remove the 'b' prefix
+                    decrypted_message = decrypted_message.decode()
+                    decrypted_message = decrypted_message.lstrip('b')
+
+                    # Decoded String
+                    parts = decrypted_message.strip().split()
+
                     if len(parts) == 10:
                         username, password = parts[0:2]
                         data = parts[2:]
                         self.accounts.append(User(username, password, data))
                         self.length += 1
+                        
         except FileNotFoundError:
             # Handle the case where the file doesn't exist yet
             pass
@@ -38,7 +60,7 @@ class Accounts:
     def add_user(self, username, password):
         # Create User
         if self.length < 10:
-            self.accounts.append(User(username, password, [60, 120, 3.5, 0.4, 3.5, 0.4, 320, 250]))
+            self.accounts.append(User(username, password, [60, 120, 3.5, 0.4, 3.5, 0.4, 320, 250])) # Nominal values of Params
             self.length += 1
             self.update_file()
         else:
@@ -47,11 +69,26 @@ class Accounts:
     # Write on File
     def update_file(self):
         try:
+            # Initialize the Key
+            cipher_suite = Fernet(hardcoded_key)
             with open(self.accounts_file_path, "w") as file:
                 for user in self.accounts:
-                    file.write(f"{user.name} {user.password} ")
+
+                    raw_string = ""
+                    raw_string += f"{user.name} {user.password} "
+                    
                     for value in user.data:
-                        file.write(f"{value} ")
-                    file.write("\n")
+                        raw_string += f"{value} "
+
+                    raw_string += "\n"
+
+                    # Encrypt Data 
+                    encrypted_message = cipher_suite.encrypt(raw_string.encode())
+                    encrypted_message_str = base64.b64encode(encrypted_message).decode()
+                    
+                    # Write on File
+                    file.write(encrypted_message_str + '\n')
+
+
         except IOError as e:
             print(f"Error writing to accounts.txt: {e}")

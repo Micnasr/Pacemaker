@@ -55,10 +55,17 @@ class Accounts:
                     # Decoded String
                     parts = decrypted_message.strip().split()
 
-                    if len(parts) == 10:
+                    if len(parts) > 0:
                         username, password = parts[0:2]
                         data = parts[2:]
-                        self.accounts.append(User(username, password, data))
+                        data_list = []
+                        prev_index = 0
+                        #The data is broken up over commas for each mode
+                        for i in range(len(data)):
+                            if data[i] == ",":
+                                data_list.append(data[prev_index:i])
+                                prev_index = i+1
+                        self.accounts.append(User(username, password, data_list))
                         self.length += 1
                         
         except FileNotFoundError:
@@ -69,7 +76,7 @@ class Accounts:
     def add_user(self, username, password):
         # Create User
         if self.length < 10:
-            self.accounts.append(User(username, password, [60, 120, 3.5, 0.4, 3.5, 0.4, 320, 250])) # Nominal values of Params
+            self.accounts.append(User(username, password, [[60, 120, 3.5, 0.4, 3.5, 0.4, 320, 250]]*4)) # Nominal values of Params
             self.length += 1
             self.update_file()
         else:
@@ -91,8 +98,11 @@ class Accounts:
                     raw_string = ""
                     raw_string += f"{user.name} {user.password} "
                     
-                    for value in user.data:
-                        raw_string += f"{value} "
+                    #Split the data for the four modes with commas
+                    for mode in user.data:
+                        for value in mode:
+                            raw_string += f"{value} "
+                        raw_string += ", "
 
                     raw_string += "\n"
 

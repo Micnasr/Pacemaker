@@ -14,6 +14,11 @@ serial = "125"
 users.serial = serial
 users.update_device_file()
 
+#EGRAMS DATA STRUCTURE
+#For the egrams data structure, we are planning on using a two dimensional array, where each internal array represents the data after a particular timestep.
+#This way, we can sample at a particular timestep and see how the egram data is changing over time
+
+
 # Define an enumeration for the different states
 class AppState(Enum):
     WELCOME = 1
@@ -112,13 +117,14 @@ def show_telemetry_state():
             widget.destroy()
         #Get correct parameters based on current mode
         mode_key = mode_settings[selected.get()]
+        current_mode = mode_order[selected.get()]
         for i in range(len(mode_key)):
             #Create labels for each parameter's name and place them one row down each iteration
             mode_label = tk.Label(frame2, text=params[mode_key[i]] + ":")
             mode_label.grid(row = i, column = 0, pady = 10)
 
             #Create labels for the values of each parameter
-            value_label = tk.Label(frame2, text=current_user.data[mode_key[i]])
+            value_label = tk.Label(frame2, text=current_user.data[current_mode][mode_key[i]])
             value_label.grid(row=i, column=1, pady=10, padx = 5)
             #Store labels inside of an array to edit them later
             value_labels.append(value_label)
@@ -135,11 +141,11 @@ def show_telemetry_state():
             #Store labels in an array to be edited later
             error_labels.append(error_label)
         #Place a button to submit changes, and when the button is pressed, execute the update_params method 
-        submit_buttom = tk.Button(frame2, text="Submit Changes", command=lambda: update_params(entry_boxes,mode_key,error_labels,value_labels))
+        submit_buttom = tk.Button(frame2, text="Submit Changes", command=lambda: update_params(entry_boxes,mode_key,error_labels,value_labels,current_mode))
         submit_buttom.grid(row=i+1, column=2)
     
     #Method to update the parameter values
-    def update_params(entries,key,errors,values):
+    def update_params(entries,key,errors,values,current_mode):
         #Loop through every text box
         for i in range(len(entries)):
             #Get the entered data
@@ -153,7 +159,7 @@ def show_telemetry_state():
                         #Check if the input is valid
                         if check_input(i, key[i], int(entry_text), errors):
                             #If the input is valid, store the result in the user data and save it to the file
-                            current_user.data[key[i]] = entry_text
+                            current_user.data[current_mode][key[i]] = entry_text
                             users.update_file()
                             #Get rid of error message and change the parameter value on screen
                             errors[i].config(text="")
@@ -168,7 +174,7 @@ def show_telemetry_state():
                         #Check if the input is valid
                         if check_input(i, key[i], float(entry_text), errors):
                             #If the input is valid, store the result in the user data and save it to the file with two decimal places
-                            current_user.data[key[i]] = str(round(float(entry_text),2))
+                            current_user.data[current_mode][key[i]] = str(round(float(entry_text),2))
                             users.update_file()
                             #Get rid of error message and change the parameter value on screen
                             errors[i].config(text="")
@@ -246,6 +252,14 @@ def show_telemetry_state():
         "VOO" : [0, 1, 4, 5],
         "AAI" : [0, 1, 2, 3, 7],
         "VVI" : [0, 1, 4, 5, 6]
+    }
+
+    #Lookup table to establish an order of the four modes
+    mode_order = {
+        "AOO" : 0,
+        "VOO" : 1,
+        "AAI" : 2,
+        "VVI" : 3
     }
 
     # Create a telemetry label

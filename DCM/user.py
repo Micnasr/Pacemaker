@@ -15,10 +15,14 @@ class Accounts:
     def __init__(self):
         self.accounts = []
         self.length = 0
+        self.old_serial = ""
+        self.serial = ""
+
 
         # Get the directory of the currently executing script (this is so that when Tas open the project, working directory will not matter)
         script_directory = os.path.dirname(os.path.abspath(__file__))
         self.accounts_file_path = os.path.join(script_directory, "accounts.txt")
+        self.device_file_path = os.path.join(script_directory, "device.txt")
 
         # Populate Array with Users from File
         self.load_accounts()
@@ -29,6 +33,10 @@ class Accounts:
             # Initialize the key
             cipher_suite = Fernet(hardcoded_key)
 
+            with open(self.device_file_path, "r") as file:
+                lines = file.readlines()
+                self.old_serial = lines[0].strip()
+            
             with open(self.accounts_file_path, "r") as file:
                 
                 lines = file.readlines()
@@ -67,8 +75,15 @@ class Accounts:
             print("Accounts limit reached (10 users).")
 
     # Write on File
+
+    def update_device_file(self):
+        with open(self.device_file_path, "w") as file:
+            file.write(self.serial)
+            
     def update_file(self):
         try:
+
+
             # Initialize the Key
             cipher_suite = Fernet(hardcoded_key)
             with open(self.accounts_file_path, "w") as file:

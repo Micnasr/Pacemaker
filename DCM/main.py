@@ -55,6 +55,25 @@ def show_welcome_state():
     welcome_label = tk.Label(frame, text="Pacemaker Welcome")
     welcome_label.pack()
 
+    connected_label = tk.Label(frame, text="", fg="white")
+    connected_label.pack(pady=10)
+
+    #Provisional placeholder
+    global connected, serial
+    connected = 1
+    serial = "122"
+    users.serial = serial
+    users.update_device_file()
+
+    #Display whether a device is connected or not 
+    if connected:
+        if serial == users.old_serial:
+            connected_label.config(text=f"Communicating With Device: {serial}", bg="green")
+        else:
+            connected_label.config(text=f"Communicating With New Device: {serial}", bg="green")
+    else:
+        connected_label.config(text="Not Communicating With Device", bg = "red")
+
     # Create username and password fields
     label_username = tk.Label(frame, text="Username:")
     label_username.pack()
@@ -229,6 +248,18 @@ def show_telemetry_state():
     # Create a telemetry label
     telemetry_label = tk.Label(frame, text="Welcome to Telemetry")
     telemetry_label.pack()
+
+    connected_label = tk.Label(frame, text="", fg="white")
+    connected_label.pack(pady=10)
+
+    #Display whether a device is connected or not 
+    if connected:
+        if serial == users.old_serial:
+            connected_label.config(text=f"Communicating With Device: {serial}", bg="green")
+        else:
+            connected_label.config(text=f"Communicating With New Device: {serial}", bg="green")
+    else:
+        connected_label.config(text="Not Communicating With Device", bg = "red")
 
     #Set default for the dropdown menu
     selected = tk.StringVar(frame)

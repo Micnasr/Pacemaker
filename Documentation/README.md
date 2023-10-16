@@ -1,2 +1,2 @@
-# This is where the documerntations is at :blush:
+# This is where the documentations is at :blush:
 

@@ -23,12 +23,13 @@ users.update_device_file()
 class AppState(Enum):
     WELCOME = 1
     TELEMETRY = 2
+    EGRAM = 3
 
 # Create the main window
 window = tk.Tk()
 
 # Set the starting size of the window (width x height)
-window.geometry("600x450")
+window.geometry("600x500")
 
 # Create a frame to hold the components
 frame = tk.Frame(window)
@@ -166,7 +167,7 @@ def show_telemetry_state():
                             values[i].config(text = entry_text)
                     else:
                         #If the data isn't an integer, throw an error
-                        errors[i].config(text = "Must enter an integer")
+                        errors[i].config(text = "Must enter a positive integer")
                 #If the parameter is meant to be a float
                 else:
                     #Get rid of decimal point and check if the resultant is a number (check if the inputted data is a number)
@@ -181,7 +182,7 @@ def show_telemetry_state():
                             values[i].config(text = entry_text)
                     else:
                         #If the data isn't a number, throw an error
-                        errors[i].config(text = "Must enter a number")
+                        errors[i].config(text = "Must enter a positive number")
             else:
                 #If the text box is an empty field, get rid of the error message
                 errors[i].config(text="")
@@ -266,7 +267,11 @@ def show_telemetry_state():
     telemetry_label = tk.Label(frame, text="Welcome to Telemetry")
     telemetry_label.pack()
 
+    egram_button = tk.Button(frame, text="Egram Data", command=lambda: update_state(AppState.EGRAM))
+    egram_button.pack(pady=10)
+
     connection_UI()
+
 
     #Set default for the dropdown menu
     selected = tk.StringVar(frame)
@@ -284,7 +289,15 @@ def show_telemetry_state():
     frame2 = tk.Frame(frame)
     frame2.pack()
 
+def show_egram_state():
+    clear_frame()
+    window.title("Egram Data")
 
+    egram_label = tk.Label(frame, text="Egram Data")
+    egram_label.pack()
+
+    back_button = tk.Button(frame, text="Go Back", command=lambda: update_state(AppState.TELEMETRY))
+    back_button.pack(pady=5)
 
 # Create a StringVar to store the current state (allows 2 way communication between widgets and variables)
 current_state = tk.StringVar()
@@ -297,6 +310,8 @@ def update_state(new_state):
         show_welcome_state()
     elif new_state == AppState.TELEMETRY:
         show_telemetry_state()
+    elif new_state == AppState.EGRAM:
+        show_egram_state()
 
 # Call the initial state
 show_welcome_state()

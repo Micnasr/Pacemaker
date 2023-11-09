@@ -76,7 +76,7 @@ class Accounts:
     def add_user(self, username, password):
         # Create User
         if self.length < 10:
-            self.accounts.append(User(username, password, [[60, 120, 3.5, 0.4, 3.5, 0.4, 320, 250]]*4)) # Nominal values of Params
+            self.accounts.append(User(username, password, [["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"],["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"],["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"],["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"]])) # Nominal values of Params
             self.length += 1
             self.update_file()
         else:

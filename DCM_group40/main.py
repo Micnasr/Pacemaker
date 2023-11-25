@@ -1,6 +1,10 @@
 import tkinter as tk
 import registration as reg
 import user as u
+import wmi
+import io                                           
+from contextlib import redirect_stdout                  
+import re 
 
 # Import the Enum class for state management
 from enum import Enum
@@ -8,11 +12,40 @@ from enum import Enum
 # Create an Accounts object
 users = u.Accounts()
 
+def grabHardwareID():
+    c = wmi.WMI()
+    serial_value = -1
+
+    captured_output = io.StringIO()
+
+    with redirect_stdout(captured_output):
+        for item in c.Win32_PhysicalMedia():
+            print(item)
+        for drive in c.Win32_DiskDrive():
+            print(drive)
+        for disk in c.Win32_LogicalDisk():
+            print(disk)
+
+    output_text = captured_output.getvalue()
+
+    pattern = r'\b[0-9A-Fa-f]{8}&\d&\d{12}\b'
+
+    # Search for the pattern using regex
+    match = re.search(pattern, output_text)
+
+    if match:
+        serial_value = match.group(0)
+        users.serial = serial_value
+        users.update_device_file()
+
+    if "SEGGER" in output_text:
+        return 1, serial_value
+    else:
+        return 0, serial_value
+
+connected, serial = grabHardwareID()
 #Provisional Placeholder for Hardware Connection
-connected = 1
-serial = "125"
-users.serial = serial
-users.update_device_file()
+
 
 #EGRAMS DATA STRUCTURE
 #For the egrams data structure, we are planning on using a two dimensional array, where each internal array represents the data after a particular timestep.
@@ -23,6 +56,7 @@ users.update_device_file()
 class AppState(Enum):
     WELCOME = 1
     TELEMETRY = 2
+    EGRAM = 3
 
 # Create the main window
 window = tk.Tk()
@@ -230,7 +264,26 @@ def show_telemetry_state():
     ]
 
     #Array holding all parameter names
-    params = ["Lower Rate Limit", "Upper Rate Limit", "Atrial Amplitude", "Atrial Pulse Width", "Ventricular Amplitude", "Ventricular Pulse Width", "VRP", "ARP"]
+    params = [
+        "Lower Rate Limit", 
+        "Upper Rate Limit",
+        "Maximum Sensor Rate", 
+        "Atrial Amplitude",
+        "Ventricular Amplitude",
+        "Atrial Pulse Width",  
+        "Ventricular Pulse Width",
+        "Atrial Sensitivity", 
+        "Ventricular Sensitivity",
+        "VRP", 
+        "ARP",
+        "PVARP",
+        "Hysteresis",
+        "Rate Smoothing",
+        "Activity Threshold",
+        "Reaction Time",
+        "Response Factor",
+        "Recovery Time"
+    ]
 
     #1 = int, 0 = float
     #Array to hold whether each parameter should be an int or float
@@ -248,10 +301,14 @@ def show_telemetry_state():
 
     #Lookup table that lists the parameters displayed in each mode
     mode_settings = {
-        "AOO" : [0, 1, 2, 3],
-        "VOO" : [0, 1, 4, 5],
-        "AAI" : [0, 1, 2, 3, 7],
-        "VVI" : [0, 1, 4, 5, 6]
+        "AOO" : [0, 1, 3, 5],
+        "VOO" : [0, 1, 4, 6],
+        "AAI" : [0, 1, 3, 5, 7, 10, 11, 12, 13],
+        "VVI" : [0, 1, 4, 6, 8, 9, 12, 13],
+        "AOOR" : [0, 1, 2, 3, 5, 14, 15, 16, 17],
+        "VOOR" : [0, 1, 2, 4, 6, 14, 15, 16, 17],
+        "AAIR" : [0, 1, 2, 3, 5, 7, 10, 11, 12, 13, 14, 15, 16, 17],
+        "VVIR" : [0, 1, 2, 4, 6, 8, 9, 12, 13, 14, 15, 16, 17]
     }
 
     #Lookup table to establish an order of the four modes
@@ -265,6 +322,12 @@ def show_telemetry_state():
     # Create a telemetry label
     telemetry_label = tk.Label(frame, text="Welcome to Telemetry")
     telemetry_label.pack()
+
+    egram_button = tk.Button(frame, text="Egram Data", command=lambda: update_state(AppState.EGRAM))
+    egram_button.pack(pady=5)
+
+    signout_button = tk.Button(frame, text="Sign Out", command=lambda: update_state(AppState.WELCOME))
+    signout_button.pack(pady=5)
 
     connection_UI()
 
@@ -284,7 +347,15 @@ def show_telemetry_state():
     frame2 = tk.Frame(frame)
     frame2.pack()
 
+def show_egram_state():
+    clear_frame()
+    window.title("Egram Data")
 
+    egram_label = tk.Label(frame, text="Egram Data")
+    egram_label.pack()
+
+    back_button = tk.Button(frame, text="Go Back", command=lambda: update_state(AppState.TELEMETRY))
+    back_button.pack(pady=5)
 
 # Create a StringVar to store the current state (allows 2 way communication between widgets and variables)
 current_state = tk.StringVar()
@@ -297,6 +368,8 @@ def update_state(new_state):
         show_welcome_state()
     elif new_state == AppState.TELEMETRY:
         show_telemetry_state()
+    elif new_state == AppState.EGRAM:
+        show_egram_state()
 
 # Call the initial state
 show_welcome_state()

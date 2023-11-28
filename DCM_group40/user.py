@@ -76,8 +76,7 @@ class Accounts:
     def add_user(self, username, password):
         # Create User
         if self.length < 10:
-            nominal_data = ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5","320","250","250", "OFF", "OFF", "MED", "30", "8", "5"]
-            data =  [nominal_data, nominal_data, nominal_data, nominal_data, nominal_data, nominal_data, nominal_data, nominal_data]
+            data =  [["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"], ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5", "320", "250", "250", "OFF", "OFF", "Med", "30", "8", "5"]]
             self.accounts.append(User(username, password, data)) # Nominal values of Params
             self.length += 1
             self.update_file()
@@ -85,7 +84,6 @@ class Accounts:
             print("Accounts limit reached (10 users).")
 
     # Write on File
-
     def update_device_file(self):
         with open(self.device_file_path, "w") as file:
             file.write(self.serial)

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import registration as reg
 import user as u
 import wmi
@@ -163,17 +164,27 @@ def show_telemetry_state():
             #Store labels inside of an array to edit them later
             value_labels.append(value_label)
 
-            #Create text boxes to program parameters
-            param_entry = tk.Entry(frame2)
-            param_entry.grid(row = i, column = 2, padx = 10, pady = 10)
-            #Store text boxes inside an array so their values can be read later
-            entry_boxes.append(param_entry)
+            if (params[mode_key[i]] != "Activity Threshold"):
+                #Create text boxes to program parameters
+                param_entry = tk.Entry(frame2)
+                param_entry.grid(row = i, column = 2, padx = 10, pady = 10)
+                #Store text boxes inside an array so their values can be read later
+                entry_boxes.append(param_entry)
+            else:
+                # Create a dropdown menu
+                options = ["V-Low", "Low", "Med-Low", "Med","Med-High", "High", "V-High"]
+                selected_option = tk.StringVar()
+                dropdown = ttk.Combobox(frame2, values=options, textvariable=selected_option)
+                dropdown.set("Select an option")
+                dropdown.grid(row=i, column=2, padx=10, pady=10)
+                entry_boxes.append(dropdown)
 
             #Create labels for error messages in case the inputted values are invalid
             error_label = tk.Label(frame2, text="", fg="red")
             error_label.grid(row=i, column=3, padx = 5, pady = 10)
             #Store labels in an array to be edited later
             error_labels.append(error_label)
+
         #Place a button to submit changes, and when the button is pressed, execute the update_params method 
         submit_buttom = tk.Button(frame2, text="Submit Changes", command=lambda: update_params(entry_boxes,mode_key,error_labels,value_labels,current_mode))
         submit_buttom.grid(row=i+1, column=2)
@@ -186,8 +197,11 @@ def show_telemetry_state():
             entry_text = entries[i].get().strip()
             #Check if the text box is empty
             if entry_text != "":
+                # if off replace to 0
+                if entry_text.lower() == "off":
+                    entry_text = "0"
                 #Check if the parameter is meant to be an integer
-                if int_or_float[key[i]]:
+                if int_or_float[key[i]] == 1:
                     #Check if the entered data is an integer
                     if entry_text.isdigit():
                         #Check if the input is valid
@@ -202,7 +216,7 @@ def show_telemetry_state():
                         #If the data isn't an integer, throw an error
                         errors[i].config(text = "Must enter an integer")
                 #If the parameter is meant to be a float
-                else:
+                elif int_or_float[key[i]] == 0:
                     #Get rid of decimal point and check if the resultant is a number (check if the inputted data is a number)
                     if entry_text.replace(".","").isnumeric():
                         #Check if the input is valid
@@ -216,6 +230,11 @@ def show_telemetry_state():
                     else:
                         #If the data isn't a number, throw an error
                         errors[i].config(text = "Must enter a number")
+                else:
+                    current_user.data[current_mode][key[i]] = entry_text
+                    users.update_file()
+                    errors[i].config(text="")
+                    values[i].config(text = entry_text)
             else:
                 #If the text box is an empty field, get rid of the error message
                 errors[i].config(text="")
@@ -297,24 +316,24 @@ def show_telemetry_state():
     #Array to hold whether each parameter should be an int or float
     int_or_float = [1,1,1,0,0,1,1,0,0,1,1,1,1,1,-1,1,1,1]
     #3D array holding valid range info for each parameter
-    params_increment = [[[30,50,5],[50,90,1],[90,175,5]],                                                   # Lower Rate Limit
-                        [[50,175,5]],                                                                       # Upper rate Limit
-                        [[50,175,5]],                                                                       # Maximum Sensor Rate
-                        [[0.1,5,0.1]],                                                                      # Atrial Amplitude
-                        [[0.1,5,0.1]],                                                                      # Venticular Amplitude
-                        [[1,30,1]],                                                                         # Atrial Pulse Width
-                        [[1,30,1]],                                                                         # Venticular Pulse Width
-                        [[0,5,0.1]],                                                                        # Atrial Sensitivity
-                        [[0,5,0.1]],                                                                        # Venticular Sensitivity
-                        [[150,500,10]],                                                                     # VRP
-                        [[150,500,10]],                                                                     # ARP
-                        [[150,500,10]],                                                                     # PVARP
-                        [[30,50,5],[50,90,1],[90,175,5]],                                                   # Hysteresis
-                        [[3,3,0],[6,6,0],[9,9,0],[12,12,0],[15,15,0],[18,18,0],[21,21,0],[25,25,0]],        # Rate Smoothing
-                        [["V-Low", "Low", "Med-Low", "Med,Med-High", "High", "V-High"]],                    # Activity Threshold
-                        [[10,50,10]],                                                                       # Reaction Time
-                        [[1,16,1]],                                                                         # Response Factor 
-                        [[2,16,1]]                                                                          # Recovery Time                             
+    params_increment = [[[30,50,5],[50,90,1],[90,175,5]],                                                           # Lower Rate Limit
+                        [[50,175,5]],                                                                               # Upper rate Limit
+                        [[50,175,5]],                                                                               # Maximum Sensor Rate
+                        [[0,0,0],[0.1,5,0.1]],                                                                      # Atrial Amplitude
+                        [[0,0,0],[0.1,5,0.1]],                                                                      # Venticular Amplitude
+                        [[1,30,1]],                                                                                 # Atrial Pulse Width
+                        [[1,30,1]],                                                                                 # Venticular Pulse Width
+                        [[0,5,0.1]],                                                                                # Atrial Sensitivity
+                        [[0,5,0.1]],                                                                                # Venticular Sensitivity
+                        [[150,500,10]],                                                                             # VRP
+                        [[150,500,10]],                                                                             # ARP
+                        [[150,500,10]],                                                                             # PVARP
+                        [[0,0,0],[30,50,5],[50,90,1],[90,175,5]],                                                   # Hysteresis
+                        [[0,0,0],[3,3,0],[6,6,0],[9,9,0],[12,12,0],[15,15,0],[18,18,0],[21,21,0],[25,25,0]],        # Rate Smoothing
+                        [],                                                                                         # Activity Threshold
+                        [[10,50,10]],                                                                               # Reaction Time
+                        [[1,16,1]],                                                                                 # Response Factor 
+                        [[2,16,1]]                                                                                  # Recovery Time                             
                         ]
 
     #Lookup table that lists the parameters displayed in each mode

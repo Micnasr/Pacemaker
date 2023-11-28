@@ -45,8 +45,6 @@ def grabHardwareID():
         return 0, serial_value
 
 connected, serial = grabHardwareID()
-#Provisional Placeholder for Hardware Connection
-
 
 #EGRAMS DATA STRUCTURE
 #For the egrams data structure, we are planning on using a two dimensional array, where each internal array represents the data after a particular timestep.
@@ -159,7 +157,11 @@ def show_telemetry_state():
             mode_label.grid(row = i, column = 0, pady = 10)
 
             #Create labels for the values of each parameter
-            value_label = tk.Label(frame2, text=current_user.data[current_mode][mode_key[i]])
+            if current_user.data[current_mode][mode_key[i]] == "0" and params[mode_key[i]] != "Atrial Sensitivity" and params[mode_key[i]] != "Ventricular Sensitivity":
+                value_label = tk.Label(frame2, text="OFF")
+            else:
+                value_label = tk.Label(frame2, text=current_user.data[current_mode][mode_key[i]])
+            
             value_label.grid(row=i, column=1, pady=10, padx = 5)
             #Store labels inside of an array to edit them later
             value_labels.append(value_label)
@@ -198,7 +200,7 @@ def show_telemetry_state():
             #Check if the text box is empty
             if entry_text != "":
                 # if off replace to 0
-                if entry_text.lower() == "off":
+                if entry_text.lower() == "off" and key[i] != 7 and key[i] != 8:
                     entry_text = "0"
                 #Check if the parameter is meant to be an integer
                 if int_or_float[key[i]] == 1:
@@ -211,7 +213,11 @@ def show_telemetry_state():
                             users.update_file()
                             #Get rid of error message and change the parameter value on screen
                             errors[i].config(text="")
-                            values[i].config(text = entry_text)
+
+                            if entry_text == "0" and key[i] != 7 and key[i] != 8:
+                                values[i].config(text = "OFF")
+                            else:
+                                values[i].config(text = entry_text)
                     else:
                         #If the data isn't an integer, throw an error
                         errors[i].config(text = "Must enter an integer")
@@ -226,7 +232,11 @@ def show_telemetry_state():
                             users.update_file()
                             #Get rid of error message and change the parameter value on screen
                             errors[i].config(text="")
-                            values[i].config(text = entry_text)
+
+                            if entry_text == "0" and key[i] != 7 and key[i] != 8:
+                                values[i].config(text = "OFF")
+                            else:
+                                values[i].config(text = entry_text)
                     else:
                         #If the data isn't a number, throw an error
                         errors[i].config(text = "Must enter a number")

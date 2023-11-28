@@ -45,15 +45,15 @@ class Accounts:
                 for encrypted_message_str in lines:
                     
                     # Decrypt the message
-                    encrypted_message = base64.b64decode(encrypted_message_str.encode())
-                    decrypted_message = cipher_suite.decrypt(encrypted_message)
+                    #encrypted_message = base64.b64decode(encrypted_message_str.encode())
+                    #decrypted_message = cipher_suite.decrypt(encrypted_message)
 
                     # Remove the 'b' prefix
-                    decrypted_message = decrypted_message.decode()
-                    decrypted_message = decrypted_message.lstrip('b')
+                    #decrypted_message = decrypted_message.decode()
+                    #decrypted_message = decrypted_message.lstrip('b')
 
                     # Decoded String
-                    parts = decrypted_message.strip().split()
+                    parts = encrypted_message_str.strip().split() # bypass encryption
 
                     if len(parts) > 0:
                         username, password = parts[0:2]
@@ -76,8 +76,8 @@ class Accounts:
     def add_user(self, username, password):
         # Create User
         if self.length < 10:
-            nominal_data = ["60", "120", "5", "3.5", "3.5", "0.4", "0.4", "0.75", "2.5","320","250","250",]
-            data =  [["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"],["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"],["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"],["60", "120", "3.5", "0.4", "3.5", "0.4", "320", "250"]]
+            nominal_data = ["60", "120", "120", "5", "5", "1", "1", "0.75", "2.5","320","250","250", "OFF", "OFF", "MED", "30", "8", "5"]
+            data =  [nominal_data, nominal_data, nominal_data, nominal_data, nominal_data, nominal_data, nominal_data, nominal_data]
             self.accounts.append(User(username, password, data)) # Nominal values of Params
             self.length += 1
             self.update_file()
@@ -109,11 +109,11 @@ class Accounts:
                     raw_string += "\n"
 
                     # Encrypt Data 
-                    encrypted_message = cipher_suite.encrypt(raw_string.encode())
-                    encrypted_message_str = base64.b64encode(encrypted_message).decode()
+                    #encrypted_message = cipher_suite.encrypt(raw_string.encode())
+                    #encrypted_message_str = base64.b64encode(encrypted_message).decode()
                     
                     # Write on File
-                    file.write(encrypted_message_str + '\n')
+                    file.write(raw_string + '\n') # bypass encryption for now
 
 
         except IOError as e:

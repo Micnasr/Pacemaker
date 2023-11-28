@@ -240,14 +240,18 @@ def show_telemetry_state():
                     errors[label_index].config(text = f"Between {interval[0]} and {interval[1]}, increment must be {interval[2]}")
                     return 0
         #If the user entered data that is outside of all valid ranges
-        error_string = "Input must be between "
+        error_string = "Input must be "
         #Tell the user the valid ranges
         for i in range(len(param_data)):
             #Include "or" when listing the last interval
             if i == len(param_data)-1 and len(param_data) > 1:
                 error_string += "or "
-            #Add the valid intervals to the string
-            error_string += f"{param_data[i][0]} - {param_data[i][1]}"
+            #Check to make sure the interval is not a singular option
+            if (param_data[i][0] == param_data[i][1]):
+                error_string += f"{param_data[i][0]}"
+            else:
+                #Add the valid intervals to the string
+                error_string += f"{param_data[i][0]} - {param_data[i][1]}"
             #Add a comma after each interval
             if i != len(param_data)-1:
                 error_string += ", "
@@ -260,7 +264,11 @@ def show_telemetry_state():
         "AOO",
         "VOO",
         "AAI",
-        "VVI"    
+        "VVI",
+        "AOOR", 
+        "VOOR",
+        "AAIR",
+        "VVIR"  
     ]
 
     #Array holding all parameter names
@@ -287,16 +295,26 @@ def show_telemetry_state():
 
     #1 = int, 0 = float
     #Array to hold whether each parameter should be an int or float
-    int_or_float = [1,1,0,0,0,0,1,1]
+    int_or_float = [1,1,1,0,0,1,1,0,0,1,1,1,1,1,-1,1,1,1]
     #3D array holding valid range info for each parameter
-    params_increment = [[[30,50,5],[50,90,1],[90,175,5]],
-                        [[50,175,5]],
-                        [[0.5,3.2,0.1],[3.5,7.0,0.5]],
-                        [[0.05,0.05,0],[0.1,1.9,0.1]],
-                        [[0.5,3.2,0.1],[3.5,7.0,0.5]],
-                        [[0.05,0.05,0],[0.1,1.9,0.1]],
-                        [[150,500,10]],
-                        [[150,500,10]]
+    params_increment = [[[30,50,5],[50,90,1],[90,175,5]],                                                   # Lower Rate Limit
+                        [[50,175,5]],                                                                       # Upper rate Limit
+                        [[50,175,5]],                                                                       # Maximum Sensor Rate
+                        [[0.1,5,0.1]],                                                                      # Atrial Amplitude
+                        [[0.1,5,0.1]],                                                                      # Venticular Amplitude
+                        [[1,30,1]],                                                                         # Atrial Pulse Width
+                        [[1,30,1]],                                                                         # Venticular Pulse Width
+                        [[0,5,0.1]],                                                                        # Atrial Sensitivity
+                        [[0,5,0.1]],                                                                        # Venticular Sensitivity
+                        [[150,500,10]],                                                                     # VRP
+                        [[150,500,10]],                                                                     # ARP
+                        [[150,500,10]],                                                                     # PVARP
+                        [[30,50,5],[50,90,1],[90,175,5]],                                                   # Hysteresis
+                        [[3,3,0],[6,6,0],[9,9,0],[12,12,0],[15,15,0],[18,18,0],[21,21,0],[25,25,0]],        # Rate Smoothing
+                        [["V-Low", "Low", "Med-Low", "Med,Med-High", "High", "V-High"]],                    # Activity Threshold
+                        [[10,50,10]],                                                                       # Reaction Time
+                        [[1,16,1]],                                                                         # Response Factor 
+                        [[2,16,1]]                                                                          # Recovery Time                             
                         ]
 
     #Lookup table that lists the parameters displayed in each mode
@@ -316,7 +334,11 @@ def show_telemetry_state():
         "AOO" : 0,
         "VOO" : 1,
         "AAI" : 2,
-        "VVI" : 3
+        "VVI" : 3,
+        "AOOR" : 4,
+        "VOOR" : 5,
+        "AAIR" : 6,
+        "VVIR" : 7
     }
 
     # Create a telemetry label

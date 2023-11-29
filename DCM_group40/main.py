@@ -5,7 +5,8 @@ import user as u
 import wmi
 import io                                           
 from contextlib import redirect_stdout                  
-import re 
+import re
+import serial_out as send
 
 # Import the Enum class for state management
 from enum import Enum
@@ -218,6 +219,8 @@ def show_telemetry_state():
                                 values[i].config(text = "OFF")
                             else:
                                 values[i].config(text = entry_text)
+
+                            send.sendSerial(current_user.data[current_mode], current_mode)
                     else:
                         #If the data isn't an integer, throw an error
                         errors[i].config(text = "Must enter an integer")
@@ -237,12 +240,15 @@ def show_telemetry_state():
                                 values[i].config(text = "OFF")
                             else:
                                 values[i].config(text = entry_text)
+
+                            send.sendSerial(current_user.data[current_mode], current_mode)
                     else:
                         #If the data isn't a number, throw an error
                         errors[i].config(text = "Must enter a number")
                 else:
                     current_user.data[current_mode][key[i]] = entry_text
                     users.update_file()
+                    send.sendSerial(current_user.data[current_mode], current_mode)
                     errors[i].config(text="")
                     values[i].config(text = entry_text)
             else:

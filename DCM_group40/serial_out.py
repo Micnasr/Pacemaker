@@ -50,6 +50,6 @@ def sendSerial(data, current_mode):
     print(len(serial_com))
     uC = serial.Serial(port, baudrate=115200)
     uC.write(serial_com)
-    # unpacked = st.unpack(serial_com)
-    # print(unpacked)
+    unpacked = st.unpack(serial_com)
+    print(unpacked)
     uC.close()

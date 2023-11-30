@@ -7,6 +7,8 @@ import io
 from contextlib import redirect_stdout                  
 import re
 import serial_out as send
+import serial_in as recieve
+import threading
 
 # Import the Enum class for state management
 from enum import Enum
@@ -57,6 +59,10 @@ class AppState(Enum):
     WELCOME = 1
     TELEMETRY = 2
     EGRAM = 3
+
+# Start monitoring in a separate thread
+threading.Thread(target=recieve.monitor_serial, args=('COM4',)).start()
+#recieve.update_egram_label(egram_data)
 
 # Create the main window
 window = tk.Tk()
@@ -410,6 +416,9 @@ def show_egram_state():
 
     egram_label = tk.Label(frame, text="Egram Data")
     egram_label.pack()
+
+    egram_data = tk.Label(frame, text="Reading...")
+    egram_data.pack()
 
     back_button = tk.Button(frame, text="Go Back", command=lambda: update_state(AppState.TELEMETRY))
     back_button.pack(pady=5)

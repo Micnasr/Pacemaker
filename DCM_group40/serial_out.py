@@ -6,6 +6,9 @@ def sendSerial(data, current_mode):
     
     st = struct.Struct('<BBBBddBBddHHHBBBBBB')
 
+    start_bit = bytes([0x16])
+    fn_code = bytes([0x22])
+
     LRL = int(data[0])
     URL = int(data[1])
     MSR = int(data[2])
@@ -36,20 +39,30 @@ def sendSerial(data, current_mode):
     Response_Factor = int(data[16])
     Recovery_Time = int(data[17])
 
-    port = 'COM4'
+    port = 'COM3'
 
-    send_data = [int(current_mode), LRL, URL, MSR, A_Amplitude, V_Amplitude, A_Pulse_Width, V_Pulse_Width, A_Sensitivity,
-                         V_Sensitivity, VRP, ARP, PVARP, Hysteresis, Rate_Smoothing, Activity_Threshold, Reaction_Time, Response_Factor, Recovery_Time]
-    
-    print(send_data)
+    uC = None
 
-    serial_com = st.pack(int(current_mode), LRL, URL, MSR, A_Amplitude, V_Amplitude, A_Pulse_Width, V_Pulse_Width, A_Sensitivity,
-                         V_Sensitivity, VRP, ARP, PVARP, Hysteresis, Rate_Smoothing, Activity_Threshold, Reaction_Time, Response_Factor, Recovery_Time)
+    try:
+        # Attempt to open the serial port
+        uC = serial.Serial(port, baudrate=115200)
 
-    print(serial_com)
-    print(len(serial_com))
-    uC = serial.Serial(port, baudrate=115200)
-    uC.write(serial_com)
-    unpacked = st.unpack(serial_com)
-    print(unpacked)
-    uC.close()
+        # Pack and send the data
+        serial_com = st.pack(int(current_mode), LRL, URL, MSR, A_Amplitude, V_Amplitude, A_Pulse_Width, V_Pulse_Width, A_Sensitivity,
+                             V_Sensitivity, VRP, ARP, PVARP, Hysteresis, Rate_Smoothing, Activity_Threshold, Reaction_Time, Response_Factor, Recovery_Time)
+
+        print(serial_com)
+        print(len(serial_com))
+
+        uC.write(start_bit + fn_code + serial_com)
+
+        # Unpack the sent data (for debugging purposes)
+        unpacked = st.unpack(serial_com)
+        print(unpacked)
+
+    except serial.SerialException as e:
+        print(f"Error: {e}")
+
+    finally:
+        if uC and uC.is_open:
+            uC.close()

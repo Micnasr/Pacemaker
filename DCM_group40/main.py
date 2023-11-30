@@ -60,10 +60,6 @@ class AppState(Enum):
     TELEMETRY = 2
     EGRAM = 3
 
-# Start monitoring in a separate thread
-threading.Thread(target=recieve.monitor_serial, args=('COM4',)).start()
-#recieve.update_egram_label(egram_data)
-
 # Create the main window
 window = tk.Tk()
 
@@ -417,11 +413,15 @@ def show_egram_state():
     egram_label = tk.Label(frame, text="Egram Data")
     egram_label.pack()
 
-    egram_data = tk.Label(frame, text="Reading...")
-    egram_data.pack()
+    # Start monitoring in a separate thread
+    threading.Thread(target=recieve.monitor_serial, args=('COM3',)).start()
 
-    back_button = tk.Button(frame, text="Go Back", command=lambda: update_state(AppState.TELEMETRY))
+    back_button = tk.Button(frame, text="Go Back", command=lambda: back_func())
     back_button.pack(pady=5)
+
+def back_func():
+    recieve.stop_serial_monitor()
+    update_state(AppState.TELEMETRY)
 
 # Create a StringVar to store the current state (allows 2 way communication between widgets and variables)
 current_state = tk.StringVar()

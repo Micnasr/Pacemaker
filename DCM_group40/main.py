@@ -302,7 +302,7 @@ def show_telemetry_state():
         errors[label_index].config(text = error_string)
         return 0
 
-    #Array to hold the names of the four modes
+    #Array to hold the names of the eight modes
     modes = [
         "AOO",
         "VOO",

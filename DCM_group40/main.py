@@ -64,11 +64,13 @@ class AppState(Enum):
 window = tk.Tk()
 
 # Set the starting size of the window (width x height)
-window.geometry("600x450")
+width = 600
+height = 450
+window.geometry(f"{width}x{height}")
 
 # Create a frame to hold the components
 frame = tk.Frame(window)
-frame.pack(expand=True, fill="both", pady=50)
+frame.pack(expand=True, fill="both")
 
 # Function to clear the current frame
 def clear_frame():
@@ -193,6 +195,9 @@ def show_telemetry_state():
         #Place a button to submit changes, and when the button is pressed, execute the update_params method 
         submit_buttom = tk.Button(frame2, text="Submit Changes", command=lambda: update_params(entry_boxes,mode_key,error_labels,value_labels,current_mode))
         submit_buttom.grid(row=i+1, column=2)
+
+        frame2.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
     
     #Method to update the parameter values
     def update_params(entries,key,errors,values,current_mode):
@@ -256,6 +261,7 @@ def show_telemetry_state():
             else:
                 #If the text box is an empty field, get rid of the error message
                 errors[i].config(text="")
+        canvas.config(width=frame2.winfo_width())
 
     #Method to check for valid input
     def check_input(label_index, index, input_data, errors):
@@ -378,6 +384,9 @@ def show_telemetry_state():
         "VVIR" : 7
     }
 
+    def mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
     # Create a telemetry label
     telemetry_label = tk.Label(frame, text="Welcome to Telemetry")
     telemetry_label.pack()
@@ -402,9 +411,19 @@ def show_telemetry_state():
     mode_button = tk.Button(frame, text="Select", command=update_text)
     mode_button.pack()
 
+    canvas = tk.Canvas(frame)
+    canvas.pack(side="left",fill="both", expand=1)
+
+    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+    scrollbar.pack(side="right", fill="y")
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+    window.bind("<MouseWheel>", mousewheel)
+
     #Create new frame to allow grid placement
-    frame2 = tk.Frame(frame)
-    frame2.pack()
+    frame2 = tk.Frame(canvas)
+    canvas.create_window((0,0), window=frame2, anchor="nw")
+    canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 def show_egram_state():
     clear_frame()

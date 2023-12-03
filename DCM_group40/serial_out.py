@@ -7,7 +7,7 @@ def sendSerial(data, current_mode):
     st = struct.Struct('<BBBBddBBddHHHBBBBBB')
 
     start_bit = bytes([0x16])
-    fn_code = bytes([0x22])
+    fn_code = bytes([0x55])
 
     LRL = int(data[0])
     URL = int(data[1])
@@ -50,6 +50,7 @@ def sendSerial(data, current_mode):
         # Pack and send the data
         serial_com = st.pack(int(current_mode), LRL, URL, MSR, A_Amplitude, V_Amplitude, A_Pulse_Width, V_Pulse_Width, A_Sensitivity,
                              V_Sensitivity, VRP, ARP, PVARP, Hysteresis, Rate_Smoothing, Activity_Threshold, Reaction_Time, Response_Factor, Recovery_Time)
+        
 
         print(serial_com)
         print(len(serial_com))
